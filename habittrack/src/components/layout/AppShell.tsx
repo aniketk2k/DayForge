@@ -99,9 +99,9 @@ function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => vo
       </NavLink>
 
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-5">
-        <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">JD</div>
+        <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">RS</div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Jordan Doe</p>
+          <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Red Hair Shanks</p>
           <p className="truncate text-xs text-[var(--text-muted)]">Personal workspace</p>
         </div>
         <button className="icon-button" type="button" onClick={onLogout} aria-label="Sign out">
@@ -157,7 +157,7 @@ export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousM
               <button className="icon-button" type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
-              <div className="hidden size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400 sm:flex">JD</div>
+              <div className="hidden size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400 sm:flex">RS</div>
             </div>
           </div>
           <div className="flex items-center gap-2 px-5 pb-4 sm:hidden">
