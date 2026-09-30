@@ -4,7 +4,9 @@ import { addMonths, format, startOfMonth } from 'date-fns'
 import './index.css'
 import { AppShell } from './components/layout/AppShell'
 import { AppDataProvider } from './context/AppDataProvider'
+import { endSession, isAuthenticated, startSession } from './auth/auth'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { LoginPage } from './pages/LoginPage'
 
 type Theme = 'dark' | 'light'
 
@@ -27,11 +29,14 @@ function useTheme() {
 
 function App() {
   const { theme, toggleTheme } = useTheme()
+  const [authenticated, setAuthenticated] = useState(isAuthenticated)
   const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date(2026, 8, 1)))
 
   const moveMonth = (amount: number) => {
     setSelectedMonth((month) => addMonths(month, amount))
   }
+
+  if (!authenticated) return <LoginPage onLogin={() => { startSession(); setAuthenticated(true) }} />
 
   return (
     <AppDataProvider>
@@ -44,6 +49,7 @@ function App() {
           onToday={() => setSelectedMonth(startOfMonth(new Date()))}
           theme={theme}
           onToggleTheme={toggleTheme}
+          onLogout={() => { endSession(); setAuthenticated(false) }}
         >
           <Routes>
             <Route path="/" element={<PlaceholderPage page="Dashboard" month={selectedMonth} monthLabel={format(selectedMonth, 'MMMM yyyy')} />} />

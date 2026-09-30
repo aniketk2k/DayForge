@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CircleDollarSign,
   LayoutDashboard,
+  LogOut,
   Menu,
   Moon,
   Settings,
@@ -31,6 +32,7 @@ type AppShellProps = {
   onToday: () => void
   theme: Theme
   onToggleTheme: () => void
+  onLogout: () => void
 }
 
 const navigation = [
@@ -42,7 +44,7 @@ const navigation = [
   { label: 'Settings', to: '/settings', icon: Settings },
 ]
 
-function Sidebar({ month, onClose }: { month: Date; onClose?: () => void }) {
+function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => void; onLogout: () => void }) {
   const { data } = useAppData()
   const analytics = calculateHabitAnalytics(data.habits, data.habitLogs, month)
 
@@ -102,15 +104,15 @@ function Sidebar({ month, onClose }: { month: Date; onClose?: () => void }) {
           <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Jordan Doe</p>
           <p className="truncate text-xs text-[var(--text-muted)]">Personal workspace</p>
         </div>
-        <button className="icon-button" type="button" aria-label="Open profile menu">
-          <Settings size={16} />
+        <button className="icon-button" type="button" onClick={onLogout} aria-label="Sign out">
+          <LogOut size={16} />
         </button>
       </div>
     </aside>
   )
 }
 
-export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme }: AppShellProps) {
+export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme, onLogout }: AppShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const location = useLocation()
   const activePage = navigation.find((item) => item.to === location.pathname)?.label ?? 'Dashboard'
@@ -118,13 +120,13 @@ export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousM
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
       <div className="hidden md:fixed md:inset-y-0 md:flex">
-        <Sidebar month={month} />
+        <Sidebar month={month} onLogout={onLogout} />
       </div>
       {isMobileNavOpen ? (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <button className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" type="button" onClick={() => setIsMobileNavOpen(false)} aria-label="Close navigation overlay" />
           <div className="relative h-full shadow-2xl shadow-slate-950/50">
-            <Sidebar month={month} onClose={() => setIsMobileNavOpen(false)} />
+            <Sidebar month={month} onClose={() => setIsMobileNavOpen(false)} onLogout={onLogout} />
           </div>
         </div>
       ) : null}
