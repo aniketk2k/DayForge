@@ -14,6 +14,8 @@ export type AppDataContextValue = {
   updateExpense: (expenseId: string, updates: Partial<Pick<Expense, 'date' | 'amount' | 'category' | 'description'>>) => void
   deleteExpense: (expenseId: string) => void
   replaceData: (value: unknown) => boolean
+  isFirstRun: boolean
+  chooseFirstRun: (mode: 'demo' | 'empty') => void
 }
 
 export const AppDataContext = createContext<AppDataContextValue | null>(null)
