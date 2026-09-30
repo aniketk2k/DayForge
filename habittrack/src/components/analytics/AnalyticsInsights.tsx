@@ -1,4 +1,5 @@
 import { Flame, Medal, TrendingDown, TrendingUp } from 'lucide-react'
+import { format } from 'date-fns'
 import type { ReactNode } from 'react'
 import { useAppData } from '../../hooks/useAppData'
 import { calculateExpenseAnalytics, formatINR } from '../../utils/expenseCalculations'
@@ -23,7 +24,7 @@ export function AnalyticsInsights({ month }: { month: Date }) {
         <InsightCard label="Longest streak" value={`${streaks[0]?.streak.longest ?? 0} days`} detail={streaks[0]?.habit.name ?? 'No active habits'} icon={<Flame className="text-orange-400" size={18} />} />
         <InsightCard label="Best habit" value={`${bestHabit?.percentage ?? 0}%`} detail={bestHabit?.habit.name ?? 'No active habits'} icon={<TrendingUp className="text-emerald-400" size={18} />} />
         <InsightCard label="Needs attention" value={`${worstHabit?.percentage ?? 0}%`} detail={worstHabit?.habit.name ?? 'No active habits'} icon={<TrendingDown className="text-rose-400" size={18} />} />
-        <InsightCard label="Highest spend" value={formatINR(highestDay.amount)} detail={highestDay.day ? `September ${highestDay.day}` : 'No expenses'} icon={<Medal className="text-amber-400" size={18} />} />
+        <InsightCard label="Highest spend" value={formatINR(highestDay.amount)} detail={highestDay.day ? `${format(month, 'MMMM')} ${highestDay.day}` : 'No expenses'} icon={<Medal className="text-amber-400" size={18} />} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
