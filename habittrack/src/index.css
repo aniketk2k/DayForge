@@ -172,3 +172,28 @@ a:focus-visible {
 .habit-cell-complete {
   box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 16%, transparent);
 }
+
+.month-picker {
+  display: inline-flex;
+  min-width: 8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  color: var(--text-strong);
+}
+
+.month-picker input {
+  min-width: 7.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-strong);
+  font-size: 0.875rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.month-picker input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.7);
+}

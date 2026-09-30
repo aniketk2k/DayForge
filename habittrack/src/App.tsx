@@ -43,7 +43,7 @@ function App() {
       <BrowserRouter>
         <AppShell
           month={selectedMonth}
-          monthLabel={format(selectedMonth, 'MMMM yyyy')}
+          onMonthChange={setSelectedMonth}
           onNextMonth={() => moveMonth(1)}
           onPreviousMonth={() => moveMonth(-1)}
           onToday={() => setSelectedMonth(startOfMonth(new Date()))}
