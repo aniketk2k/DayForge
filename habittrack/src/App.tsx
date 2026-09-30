@@ -37,6 +37,7 @@ function App() {
     <AppDataProvider>
       <BrowserRouter>
         <AppShell
+          month={selectedMonth}
           monthLabel={format(selectedMonth, 'MMMM yyyy')}
           onNextMonth={() => moveMonth(1)}
           onPreviousMonth={() => moveMonth(-1)}

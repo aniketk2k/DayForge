@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { format } from 'date-fns'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   BarChart3,
@@ -16,11 +17,14 @@ import {
   Target,
   X,
 } from 'lucide-react'
+import { useAppData } from '../../hooks/useAppData'
+import { calculateHabitAnalytics } from '../../utils/habitCalculations'
 
 type Theme = 'dark' | 'light'
 
 type AppShellProps = {
   children: ReactNode
+  month: Date
   monthLabel: string
   onNextMonth: () => void
   onPreviousMonth: () => void
@@ -38,7 +42,10 @@ const navigation = [
   { label: 'Settings', to: '/settings', icon: Settings },
 ]
 
-function Sidebar({ onClose }: { onClose?: () => void }) {
+function Sidebar({ month, onClose }: { month: Date; onClose?: () => void }) {
+  const { data } = useAppData()
+  const analytics = calculateHabitAnalytics(data.habits, data.habitLogs, month)
+
   return (
     <aside className="flex h-full w-72 flex-col border-r border-[var(--border)] bg-[var(--sidebar)] px-4 py-5">
       <div className="flex items-center justify-between px-3">
@@ -74,17 +81,20 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         ))}
       </nav>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-soft)] p-4">
+      <NavLink className="group block rounded-2xl border border-[var(--border)] bg-[var(--panel-soft)] p-4 transition hover:border-[var(--accent-border)]" to="/" onClick={onClose} aria-label={`Open ${format(month, 'MMMM yyyy')} monthly focus`}>
         <div className="mb-3 flex items-center justify-between">
           <span className="text-xs font-semibold text-[var(--text-muted)]">Monthly focus</span>
-          <Target className="text-[var(--accent)]" size={16} />
+          <Target className="text-[var(--accent)] transition group-hover:scale-110" size={16} />
         </div>
-        <p className="text-sm font-semibold text-[var(--text-strong)]">Build a rhythm that lasts.</p>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--track)]">
-          <div className="h-full w-[32%] rounded-full bg-[var(--accent)]" />
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-sm font-semibold text-[var(--text-strong)]">{format(month, 'MMMM')} rhythm</p>
+          <span className="text-xs font-bold text-[var(--accent)]">{analytics.percentage}%</span>
         </div>
-        <p className="mt-2 text-[11px] text-[var(--text-muted)]">Your dashboard is ready for Phase 2.</p>
-      </div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--track)]" aria-label={`${analytics.percentage}% monthly progress`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={analytics.percentage}>
+          <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${analytics.percentage}%` }} />
+        </div>
+        <p className="mt-2 text-[11px] text-[var(--text-muted)]">{analytics.completed} of {analytics.goal} goal days complete</p>
+      </NavLink>
 
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-5">
         <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">JD</div>
@@ -100,7 +110,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   )
 }
 
-export function AppShell({ children, monthLabel, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme }: AppShellProps) {
+export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme }: AppShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const location = useLocation()
   const activePage = navigation.find((item) => item.to === location.pathname)?.label ?? 'Dashboard'
@@ -108,13 +118,13 @@ export function AppShell({ children, monthLabel, onNextMonth, onPreviousMonth, o
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
       <div className="hidden md:fixed md:inset-y-0 md:flex">
-        <Sidebar />
+        <Sidebar month={month} />
       </div>
       {isMobileNavOpen ? (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <button className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" type="button" onClick={() => setIsMobileNavOpen(false)} aria-label="Close navigation overlay" />
           <div className="relative h-full shadow-2xl shadow-slate-950/50">
-            <Sidebar onClose={() => setIsMobileNavOpen(false)} />
+            <Sidebar month={month} onClose={() => setIsMobileNavOpen(false)} />
           </div>
         </div>
       ) : null}
