@@ -4,6 +4,7 @@ import { addMonths, format, startOfMonth } from 'date-fns'
 import './index.css'
 import { AppShell } from './components/layout/AppShell'
 import { AppDataProvider } from './context/AppDataProvider'
+import { ToastProvider } from './context/ToastProvider'
 import { endSession, isAuthenticated, startSession } from './auth/auth'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { LoginPage } from './pages/LoginPage'
@@ -39,11 +40,12 @@ function App() {
   if (!authenticated) return <LoginPage onLogin={() => { startSession(); setAuthenticated(true) }} />
 
   return (
-    <AppDataProvider>
-      <BrowserRouter>
+    <ToastProvider>
+      <AppDataProvider>
+        <BrowserRouter>
         <AppShell
           month={selectedMonth}
-          monthLabel={format(selectedMonth, 'MMMM yyyy')}
+          onMonthChange={setSelectedMonth}
           onNextMonth={() => moveMonth(1)}
           onPreviousMonth={() => moveMonth(-1)}
           onToday={() => setSelectedMonth(startOfMonth(new Date()))}
@@ -61,8 +63,9 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AppShell>
-      </BrowserRouter>
-    </AppDataProvider>
+        </BrowserRouter>
+      </AppDataProvider>
+    </ToastProvider>
   )
 }
 

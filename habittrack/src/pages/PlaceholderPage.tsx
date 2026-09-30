@@ -1,13 +1,14 @@
 import { BarChart3, CircleDollarSign, LayoutDashboard, Settings, Target, TrendingUp } from 'lucide-react'
-import type { ReactNode } from 'react'
-import { AnalyticsInsights } from '../components/analytics/AnalyticsInsights'
-import { HabitAnalytics } from '../components/dashboard/HabitAnalytics'
-import { HabitTracker } from '../components/dashboard/HabitTracker'
-import { ExpenseOverview } from '../components/expenses/ExpenseOverview'
-import { ExpenseManagement } from '../components/expenses/ExpenseManagement'
-import { HabitManagement } from '../components/habits/HabitManagement'
-import { YearlyOverview } from '../components/yearly/YearlyOverview'
-import { SettingsPanel } from '../components/settings/SettingsPanel'
+import { lazy, Suspense, type ReactNode } from 'react'
+
+const AnalyticsInsights = lazy(() => import('../components/analytics/AnalyticsInsights').then((module) => ({ default: module.AnalyticsInsights })))
+const HabitAnalytics = lazy(() => import('../components/dashboard/HabitAnalytics').then((module) => ({ default: module.HabitAnalytics })))
+const HabitTracker = lazy(() => import('../components/dashboard/HabitTracker').then((module) => ({ default: module.HabitTracker })))
+const ExpenseOverview = lazy(() => import('../components/expenses/ExpenseOverview').then((module) => ({ default: module.ExpenseOverview })))
+const ExpenseManagement = lazy(() => import('../components/expenses/ExpenseManagement').then((module) => ({ default: module.ExpenseManagement })))
+const HabitManagement = lazy(() => import('../components/habits/HabitManagement').then((module) => ({ default: module.HabitManagement })))
+const YearlyOverview = lazy(() => import('../components/yearly/YearlyOverview').then((module) => ({ default: module.YearlyOverview })))
+const SettingsPanel = lazy(() => import('../components/settings/SettingsPanel').then((module) => ({ default: module.SettingsPanel })))
 
 type PlaceholderPageProps = {
   page: string
@@ -28,7 +29,7 @@ const pageCopy: Record<string, { description: string; icon: typeof LayoutDashboa
 export function PlaceholderPage({ page, monthLabel, month, onSelectMonth }: PlaceholderPageProps) {
   const content = pageCopy[page]
   const Icon = content.icon
-  const phaseContent: ReactNode = page === 'Dashboard' ? <><HabitAnalytics month={month} /><HabitTracker month={month} /><ExpenseOverview month={month} /></> : page === 'Habits' ? <HabitManagement month={month} /> : page === 'Expenses' ? <ExpenseManagement month={month} /> : page === 'Analytics' ? <><HabitAnalytics month={month} /><AnalyticsInsights month={month} /></> : page === 'Yearly Overview' && onSelectMonth ? <YearlyOverview month={month} onSelectMonth={onSelectMonth} /> : page === 'Settings' ? <SettingsPanel /> : null
+  const phaseContent: ReactNode = <Suspense fallback={<LoadingState />}>{page === 'Dashboard' ? <><HabitAnalytics month={month} /><HabitTracker month={month} /><ExpenseOverview month={month} /></> : page === 'Habits' ? <HabitManagement month={month} /> : page === 'Expenses' ? <ExpenseManagement month={month} /> : page === 'Analytics' ? <><HabitAnalytics month={month} /><AnalyticsInsights month={month} /></> : page === 'Yearly Overview' && onSelectMonth ? <YearlyOverview month={month} onSelectMonth={onSelectMonth} /> : page === 'Settings' ? <SettingsPanel /> : null}</Suspense>
 
   return (
     <div className="animate-fade-in">
@@ -55,4 +56,8 @@ export function PlaceholderPage({ page, monthLabel, month, onSelectMonth }: Plac
       </div>
     </div>
   )
+}
+
+function LoadingState() {
+  return <div className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--panel)] p-8 text-sm text-[var(--text-muted)]" role="status">Loading workspace...</div>
 }

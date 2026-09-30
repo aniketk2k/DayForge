@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { format } from 'date-fns'
+import { format, isValid, parse, startOfMonth } from 'date-fns'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   BarChart3,
@@ -26,7 +26,7 @@ type Theme = 'dark' | 'light'
 type AppShellProps = {
   children: ReactNode
   month: Date
-  monthLabel: string
+  onMonthChange: (month: Date) => void
   onNextMonth: () => void
   onPreviousMonth: () => void
   onToday: () => void
@@ -99,9 +99,9 @@ function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => vo
       </NavLink>
 
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-5">
-        <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">JD</div>
+        <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">RS</div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Jordan Doe</p>
+          <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Red Hair Shanks</p>
           <p className="truncate text-xs text-[var(--text-muted)]">Personal workspace</p>
         </div>
         <button className="icon-button" type="button" onClick={onLogout} aria-label="Sign out">
@@ -112,7 +112,7 @@ function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => vo
   )
 }
 
-export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme, onLogout }: AppShellProps) {
+export function AppShell({ children, month, onMonthChange, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme, onLogout }: AppShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const location = useLocation()
   const activePage = navigation.find((item) => item.to === location.pathname)?.label ?? 'Dashboard'
@@ -146,10 +146,7 @@ export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousM
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="hidden items-center rounded-xl border border-[var(--border)] bg-[var(--panel)] p-1 sm:flex">
                 <button className="date-button" type="button" onClick={onPreviousMonth} aria-label="Previous month"><ChevronLeft size={16} /></button>
-                <button className="flex min-w-32 items-center justify-center gap-2 px-2 text-sm font-semibold text-[var(--text-strong)]" type="button" aria-label="Choose month">
-                  <CalendarDays size={15} className="text-[var(--accent)]" />
-                  {monthLabel}
-                </button>
+                <MonthPicker month={month} onChange={onMonthChange} />
                 <button className="date-button" type="button" onClick={onNextMonth} aria-label="Next month"><ChevronRight size={16} /></button>
               </div>
               <button className="hidden rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)] transition hover:border-[var(--accent-border)] hover:text-[var(--text-strong)] sm:block" type="button" onClick={onToday}>Today</button>
@@ -157,12 +154,12 @@ export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousM
               <button className="icon-button" type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
-              <div className="hidden size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400 sm:flex">JD</div>
+              <div className="hidden size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400 sm:flex">RS</div>
             </div>
           </div>
           <div className="flex items-center gap-2 px-5 pb-4 sm:hidden">
             <button className="date-button border border-[var(--border)]" type="button" onClick={onPreviousMonth} aria-label="Previous month"><ChevronLeft size={16} /></button>
-            <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--panel)] py-2 text-sm font-semibold text-[var(--text-strong)]"><CalendarDays size={15} className="text-[var(--accent)]" />{monthLabel}</div>
+            <MonthPicker month={month} onChange={onMonthChange} />
             <button className="date-button border border-[var(--border)]" type="button" onClick={onNextMonth} aria-label="Next month"><ChevronRight size={16} /></button>
             <button className="rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)]" type="button" onClick={onToday}>Today</button>
           </div>
@@ -171,4 +168,13 @@ export function AppShell({ children, month, monthLabel, onNextMonth, onPreviousM
       </div>
     </div>
   )
+}
+
+function MonthPicker({ month, onChange }: { month: Date; onChange: (month: Date) => void }) {
+  const handleChange = (value: string) => {
+    const parsedMonth = parse(value, 'yyyy-MM', new Date())
+    if (isValid(parsedMonth)) onChange(startOfMonth(parsedMonth))
+  }
+
+  return <label className="month-picker"><CalendarDays className="text-[var(--accent)]" size={15} /><span className="sr-only">Choose month and year</span><input aria-label="Choose month and year" type="month" value={format(month, 'yyyy-MM')} onChange={(event) => handleChange(event.target.value)} /></label>
 }
