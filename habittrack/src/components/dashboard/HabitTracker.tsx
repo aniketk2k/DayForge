@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, isToday } from 'date-fns'
 import { Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAppData } from '../../hooks/useAppData'
@@ -38,10 +38,30 @@ export function HabitTracker({ month, onPreviousMonth, onNextMonth, onToday }: {
               <th className="min-w-20 px-2 py-2 text-center" rowSpan={3}>Completed</th>
             </tr>
             <tr className="bg-[var(--panel-soft)] text-center text-[9px] font-medium text-[var(--text-muted)]">
-              {days.map((day) => <th className="px-0 py-1" key={`dow-${dateKey(day)}`}>{format(day, 'EEE')}</th>)}
+              {days.map((day) => {
+                const isCurrent = isToday(day)
+                return (
+                  <th className={`px-0 py-1 ${isCurrent ? 'text-[var(--accent)] font-bold' : ''}`} key={`dow-${dateKey(day)}`}>
+                    {format(day, 'EEE')}
+                  </th>
+                )
+              })}
             </tr>
             <tr className="bg-[var(--panel-soft)] text-center text-[10px] font-semibold text-[var(--text-strong)]">
-              {days.map((day) => <th className="min-w-5 px-0 py-1" key={dateKey(day)}>{format(day, 'd')}</th>)}
+              {days.map((day) => {
+                const isCurrent = isToday(day)
+                return (
+                  <th className="min-w-5 px-0 py-1" key={dateKey(day)}>
+                    {isCurrent ? (
+                      <span className="inline-flex size-5 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] text-[10px] font-bold shadow-sm" title="Today">
+                        {format(day, 'd')}
+                      </span>
+                    ) : (
+                      format(day, 'd')
+                    )}
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody>
@@ -60,9 +80,10 @@ export function HabitTracker({ month, onPreviousMonth, onNextMonth, onToday }: {
                   <td className="px-2 py-1.5 text-center text-xs text-[var(--text-strong)]">{habit.monthlyTarget}</td>
                   {days.map((day) => {
                     const dayKey = dateKey(day)
+                    const isCurrent = isToday(day)
                     const done = data.habitLogs.some((log) => log.habitId === habit.id && log.date === dayKey && log.completed)
                     return (
-                      <td className="px-0 py-1.5 text-center" key={dayKey}>
+                      <td className={`px-0 py-1.5 text-center ${isCurrent ? 'today-column' : ''}`} key={dayKey}>
                         <button className={`habit-cell ${done ? 'habit-cell-complete' : ''}`} style={done ? { backgroundColor: habit.color, borderColor: habit.color } : {}} type="button" onClick={() => toggleHabitLog(habit.id, dayKey)} aria-label={`${habit.name}, ${format(day, 'MMMM d, yyyy')}, ${done ? 'completed' : 'not completed'}`} aria-pressed={done}>
                           {done ? <Check size={11} strokeWidth={3.5} /> : null}
                         </button>

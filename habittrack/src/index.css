@@ -271,3 +271,23 @@ a:focus-visible {
   cursor: pointer;
   filter: invert(0.7);
 }
+
+.resizer-line {
+  position: absolute;
+  right: -3px;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 40;
+  transition: background-color 150ms ease;
+}
+
+.resizer-line:hover,
+.resizer-line.is-dragging {
+  background-color: var(--accent);
+}
+
+.today-column {
+  background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+}
