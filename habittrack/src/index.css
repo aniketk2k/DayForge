@@ -1,23 +1,25 @@
 @import 'tailwindcss';
 
 :root {
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
-  color: #cbd5e1;
-  background: #07111f;
-  --background: #07111f;
-  --sidebar: #0a1728;
-  --panel: #0e1d31;
-  --panel-soft: #0b192b;
-  --border: #1c3047;
-  --border-strong: #2b4662;
-  --track: #1b3047;
-  --text: #cbd5e1;
-  --text-strong: #f8fafc;
-  --text-muted: #91a4b9;
-  --text-faint: #5d738b;
-  --accent: #58d6e8;
-  --accent-border: rgba(88, 214, 232, 0.45);
-  --shadow: 0 24px 80px rgba(2, 8, 23, 0.25);
+  font-family: 'Inter', 'DM Sans', 'Segoe UI', sans-serif;
+  color: #c3cfdf;
+  background: #050b18;
+  --background: #050b18;
+  --sidebar: #070f1e;
+  --panel: #0a1424;
+  --panel-soft: #0d1a2e;
+  --border: #16263d;
+  --border-strong: #26405f;
+  --track: #1d2b40;
+  --text: #c3cfdf;
+  --text-strong: #f4f7fb;
+  --text-muted: #8fa1b8;
+  --text-faint: #5b6f88;
+  --accent: #19c98b;
+  --accent-contrast: #04140e;
+  --accent-border: rgba(25, 201, 139, 0.5);
+  --nav-active: rgba(25, 201, 139, 0.14);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -25,22 +27,24 @@
 }
 
 :root[data-theme='light'] {
-  color: #334155;
-  background: #f4f7fb;
-  --background: #f4f7fb;
-  --sidebar: #ffffff;
+  color: #3b4a60;
+  background: #f3f6fc;
+  --background: #f3f6fc;
+  --sidebar: #fbfcff;
   --panel: #ffffff;
-  --panel-soft: #f8fafc;
-  --border: #dbe4ee;
-  --border-strong: #b9c9d9;
-  --track: #e4edf5;
-  --text: #475569;
-  --text-strong: #102033;
-  --text-muted: #6b7e92;
-  --text-faint: #8ea0b1;
-  --accent: #0b92a8;
-  --accent-border: rgba(11, 146, 168, 0.45);
-  --shadow: 0 24px 80px rgba(33, 57, 82, 0.08);
+  --panel-soft: #f6f8fd;
+  --border: #e1e8f3;
+  --border-strong: #c5d2e4;
+  --track: #e3eaf6;
+  --text: #3b4a60;
+  --text-strong: #14213d;
+  --text-muted: #66768e;
+  --text-faint: #8d9bb0;
+  --accent: #3b6cf6;
+  --accent-contrast: #ffffff;
+  --accent-border: rgba(59, 108, 246, 0.45);
+  --nav-active: #e3ebff;
+  --shadow: 0 6px 20px rgba(40, 62, 110, 0.07);
 }
 
 * {
@@ -108,8 +112,62 @@ a:focus-visible {
 }
 
 .nav-link-active {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  background: var(--nav-active);
+  color: var(--text-strong);
+}
+
+.nav-link-active svg {
   color: var(--accent);
+}
+
+.box-button {
+  display: inline-flex;
+  height: 2.4rem;
+  min-width: 2.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.6rem;
+  background: var(--panel);
+  padding: 0 0.7rem;
+  color: var(--text-strong);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: 160ms ease;
+}
+
+.box-button:hover {
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  padding: 0.5rem 0.9rem;
+  color: var(--accent-contrast);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.tile-icon {
+  display: flex;
+  height: 3.2rem;
+  width: 3.2rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
 }
 
 @keyframes fade-in {
@@ -164,24 +222,29 @@ a:focus-visible {
 
 .habit-cell {
   display: inline-flex;
-  height: 1.7rem;
-  width: 1.7rem;
+  height: 1.15rem;
+  width: 1.15rem;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-strong);
-  border-radius: 0.45rem;
-  background: var(--panel-soft);
-  color: #07111f;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: #ffffff;
   transition: 140ms ease;
 }
 
 .habit-cell:hover {
   border-color: var(--accent);
-  transform: translateY(-1px);
+  transform: scale(1.12);
 }
 
 .habit-cell-complete {
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.matrix th,
+.matrix td {
+  border: 1px solid var(--border);
 }
 
 .month-picker {

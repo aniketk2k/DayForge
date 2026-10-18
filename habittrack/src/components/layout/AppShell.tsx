@@ -1,25 +1,24 @@
 import { useState, type ReactNode } from 'react'
 import { format, isValid, parse, startOfMonth } from 'date-fns'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import {
   BarChart3,
-  Bell,
   CalendarDays,
+  CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  CircleDollarSign,
-  LayoutDashboard,
+  Home,
+  Leaf,
   LogOut,
   Menu,
   Moon,
+  Search,
   Settings,
-  Sparkles,
   Sun,
-  Target,
+  Wallet,
   X,
 } from 'lucide-react'
-import { useAppData } from '../../hooks/useAppData'
-import { calculateHabitAnalytics } from '../../utils/habitCalculations'
 
 type Theme = 'dark' | 'light'
 
@@ -36,29 +35,21 @@ type AppShellProps = {
 }
 
 const navigation = [
-  { label: 'Dashboard', to: '/', icon: LayoutDashboard },
-  { label: 'Habits', to: '/habits', icon: Target },
-  { label: 'Expenses', to: '/expenses', icon: CircleDollarSign },
+  { label: 'Dashboard', to: '/', icon: Home },
+  { label: 'Habits', to: '/habits', icon: CheckCircle2 },
+  { label: 'Expenses', to: '/expenses', icon: Wallet },
   { label: 'Analytics', to: '/analytics', icon: BarChart3 },
   { label: 'Yearly Overview', to: '/yearly-overview', icon: CalendarDays },
   { label: 'Settings', to: '/settings', icon: Settings },
 ]
 
-function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => void; onLogout: () => void }) {
-  const { data } = useAppData()
-  const analytics = calculateHabitAnalytics(data.habits, data.habitLogs, month)
-
+function Sidebar({ onClose, theme, onToggleTheme }: { onClose?: () => void; theme: Theme; onToggleTheme: () => void }) {
   return (
     <aside className="flex h-full w-56 flex-col border-r border-[var(--border)] bg-[var(--sidebar)] px-3 py-5">
-      <div className="flex items-center justify-between px-3">
-        <NavLink className="flex items-center gap-3" to="/" onClick={onClose}>
-          <span className="flex size-10 items-center justify-center rounded-xl bg-[var(--accent)] text-slate-950 shadow-lg shadow-cyan-500/20">
-            <Sparkles size={19} strokeWidth={2.5} />
-          </span>
-          <span>
-            <span className="block text-sm font-bold tracking-wide text-[var(--text-strong)]">HabitTrack</span>
-            <span className="block text-xs text-[var(--text-muted)]">Your daily rhythm</span>
-          </span>
+      <div className="flex items-center justify-between px-2">
+        <NavLink className="flex items-center gap-2.5" to="/" onClick={onClose}>
+          <Leaf className="text-[var(--accent)]" size={28} fill="currentColor" strokeWidth={1.5} />
+          <span className="text-xl font-bold tracking-tight text-[var(--text-strong)]">HabitTrack</span>
         </NavLink>
         {onClose ? (
           <button className="icon-button md:hidden" type="button" onClick={onClose} aria-label="Close navigation">
@@ -67,104 +58,86 @@ function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => vo
         ) : null}
       </div>
 
-      <div className="mt-10 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-faint)]">Workspace</div>
-      <nav className="mt-3 flex flex-1 flex-col gap-1" aria-label="Primary navigation">
+      <nav className="mt-8 flex flex-col gap-1" aria-label="Primary navigation">
         {navigation.map(({ label, to, icon: Icon }) => (
-          <NavLink
-            className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}
-            end={to === '/'}
-            key={to}
-            to={to}
-            onClick={onClose}
-          >
+          <NavLink className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`} end={to === '/'} key={to} to={to} onClick={onClose}>
             <Icon size={18} strokeWidth={1.8} />
             {label}
           </NavLink>
         ))}
       </nav>
 
-      <NavLink className="group block rounded-2xl border border-[var(--border)] bg-[var(--panel-soft)] p-4 transition hover:border-[var(--accent-border)]" to="/" onClick={onClose} aria-label={`Open ${format(month, 'MMMM yyyy')} monthly focus`}>
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-semibold text-[var(--text-muted)]">Monthly focus</span>
-          <Target className="text-[var(--accent)] transition group-hover:scale-110" size={16} />
-        </div>
-        <div className="flex items-end justify-between gap-3">
-          <p className="text-sm font-semibold text-[var(--text-strong)]">{format(month, 'MMMM')} rhythm</p>
-          <span className="text-xs font-bold text-[var(--accent)]">{analytics.percentage}%</span>
-        </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--track)]" aria-label={`${analytics.percentage}% monthly progress`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={analytics.percentage}>
-          <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${analytics.percentage}%` }} />
-        </div>
-        <p className="mt-2 text-[11px] text-[var(--text-muted)]">{analytics.completed} of {analytics.goal} goal days complete</p>
-      </NavLink>
+      <div className="flex-1" />
 
-      <div className="mt-5 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-5">
-        <div className="flex size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400">RS</div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[var(--text-strong)]">Red Hair Shanks</p>
-          <p className="truncate text-xs text-[var(--text-muted)]">Personal workspace</p>
-        </div>
-        <button className="icon-button" type="button" onClick={onLogout} aria-label="Sign out">
-          <LogOut size={16} />
-        </button>
+      <div className="relative mb-4 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-soft)] p-4">
+        <p className="text-sm italic leading-relaxed text-[var(--text-muted)]">“Better habits<br />A better you.”</p>
+        <svg className="mt-6 h-16 w-full text-[var(--border-strong)]" viewBox="0 0 200 60" fill="currentColor" aria-hidden="true">
+          <path d="M0 60 L45 22 L65 40 L105 6 L150 44 L170 30 L200 60 Z" opacity="0.55" />
+        </svg>
       </div>
+
+      <button className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--panel-soft)] px-3 py-2.5 text-xs font-medium text-[var(--text-strong)]" type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+        <Sun size={16} className={theme === 'light' ? 'text-[var(--accent)]' : 'text-[var(--text-faint)]'} />
+        <Moon size={16} className={theme === 'dark' ? 'text-[var(--accent)]' : 'text-[var(--text-faint)]'} />
+        <span className="ml-auto">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+      </button>
     </aside>
   )
 }
 
 export function AppShell({ children, month, onMonthChange, onNextMonth, onPreviousMonth, onToday, theme, onToggleTheme, onLogout }: AppShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
-  const location = useLocation()
-  const activePage = navigation.find((item) => item.to === location.pathname)?.label ?? 'Dashboard'
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
       <div className="hidden md:fixed md:inset-y-0 md:flex">
-        <Sidebar month={month} onLogout={onLogout} />
+        <Sidebar theme={theme} onToggleTheme={onToggleTheme} />
       </div>
       {isMobileNavOpen ? (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <button className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" type="button" onClick={() => setIsMobileNavOpen(false)} aria-label="Close navigation overlay" />
           <div className="relative h-full shadow-2xl shadow-slate-950/50">
-            <Sidebar month={month} onClose={() => setIsMobileNavOpen(false)} onLogout={onLogout} />
+            <Sidebar theme={theme} onToggleTheme={onToggleTheme} onClose={() => setIsMobileNavOpen(false)} />
           </div>
         </div>
       ) : null}
 
       <div className="md:pl-56">
-        <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-xl">
-          <div className="flex min-h-20 items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
-            <div className="flex min-w-0 items-center gap-3">
-              <button className="icon-button md:hidden" type="button" onClick={() => setIsMobileNavOpen(true)} aria-label="Open navigation">
-                <Menu size={20} />
+        <header className="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+            <h1 className="sr-only">HabitTrack dashboard</h1>
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="md:hidden"><button className="box-button" type="button" onClick={() => setIsMobileNavOpen(true)} aria-label="Open navigation">
+                <Menu size={18} />
+              </button></span>
+              <button className="box-button" type="button" onClick={onPreviousMonth} aria-label="Previous month"><ChevronLeft size={16} /></button>
+              <MonthPicker month={month} onChange={onMonthChange} />
+              <button className="box-button" type="button" onClick={onNextMonth} aria-label="Next month"><ChevronRight size={16} /></button>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="box-button" type="button" onClick={onToday}><Search size={14} className="hidden sm:block" />Today</button>
+              <button className="box-button hidden sm:inline-flex" type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+                {theme === 'dark' ? <CalendarDays size={16} /> : <Sun size={16} />}
               </button>
-              <div className="min-w-0">
-                <p className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-faint)] sm:block">Workspace / {activePage}</p>
-                <h1 className="truncate text-lg font-semibold text-[var(--text-strong)] sm:mt-1 sm:text-xl">{activePage}</h1>
+              <div className="relative">
+                <button className="flex items-center gap-2 rounded-xl px-2 py-1 text-sm font-medium text-[var(--text-strong)]" type="button" onClick={() => setMenuOpen((open) => !open)} aria-haspopup="menu" aria-expanded={menuOpen}>
+                  <span className="flex size-8 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-[var(--accent-contrast)]">A</span>
+                  <span className="hidden sm:inline">Aniket</span>
+                  <ChevronDown size={14} />
+                </button>
+                {menuOpen ? (
+                  <div className="card absolute right-0 mt-2 w-40 p-1" role="menu">
+                    <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-strong)] hover:bg-[var(--panel-soft)]" type="button" role="menuitem" onClick={onLogout} aria-label="Sign out">
+                      <LogOut size={15} /> Sign out
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden items-center rounded-xl border border-[var(--border)] bg-[var(--panel)] p-1 sm:flex">
-                <button className="date-button" type="button" onClick={onPreviousMonth} aria-label="Previous month"><ChevronLeft size={16} /></button>
-                <MonthPicker month={month} onChange={onMonthChange} />
-                <button className="date-button" type="button" onClick={onNextMonth} aria-label="Next month"><ChevronRight size={16} /></button>
-              </div>
-              <button className="hidden rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)] transition hover:border-[var(--accent-border)] hover:text-[var(--text-strong)] sm:block" type="button" onClick={onToday}>Today</button>
-              <button className="icon-button" type="button" aria-label="Notifications"><Bell size={18} /></button>
-              <button className="icon-button" type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <div className="hidden size-9 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-400 sm:flex">RS</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 px-5 pb-4 sm:hidden">
-            <button className="date-button border border-[var(--border)]" type="button" onClick={onPreviousMonth} aria-label="Previous month"><ChevronLeft size={16} /></button>
-            <MonthPicker month={month} onChange={onMonthChange} />
-            <button className="date-button border border-[var(--border)]" type="button" onClick={onNextMonth} aria-label="Next month"><ChevronRight size={16} /></button>
-            <button className="rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)]" type="button" onClick={onToday}>Today</button>
           </div>
         </header>
-        <main className="mx-auto max-w-[1600px] px-5 py-7 sm:px-8 lg:px-10 lg:py-9">{children}</main>
+        <main className="mx-auto max-w-[1700px] px-4 pb-8 pt-1 sm:px-5">{children}</main>
       </div>
     </div>
   )
@@ -176,5 +149,5 @@ function MonthPicker({ month, onChange }: { month: Date; onChange: (month: Date)
     if (isValid(parsedMonth)) onChange(startOfMonth(parsedMonth))
   }
 
-  return <label className="month-picker"><CalendarDays className="text-[var(--accent)]" size={15} /><span className="sr-only">Choose month and year</span><input aria-label="Choose month and year" type="month" value={format(month, 'yyyy-MM')} onChange={(event) => handleChange(event.target.value)} /></label>
+  return <label className="month-picker box-button"><span className="sr-only">Choose month and year</span><input aria-label="Choose month and year" type="month" value={format(month, 'yyyy-MM')} onChange={(event) => handleChange(event.target.value)} /></label>
 }

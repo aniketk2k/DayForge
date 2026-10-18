@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+/package.json
+/package-lock.json
+
+# Documentation and planning files
+*.md
+**/*.md
+
+# Credentials and local text files
+*.txt
+
+# Test results and reports
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment and local files
+.env*
+*.local
+.DS_Store
+Thumbs.db
+*.log

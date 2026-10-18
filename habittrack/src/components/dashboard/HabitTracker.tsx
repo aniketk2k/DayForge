@@ -1,33 +1,47 @@
 import { format } from 'date-fns'
-import { Check, Plus } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAppData } from '../../hooks/useAppData'
 import { dateKey, getMonthWeeks } from '../../utils/dateUtils'
 
-export function HabitTracker({ month }: { month: Date }) {
+export function HabitTracker({ month, onPreviousMonth, onNextMonth, onToday }: { month: Date; onPreviousMonth?: () => void; onNextMonth?: () => void; onToday?: () => void }) {
   const { data, toggleHabitLog } = useAppData()
   const habits = data.habits.filter((habit) => habit.active).sort((a, b) => a.order - b.order)
   const weeks = getMonthWeeks(month)
   const days = weeks.flat()
 
   return (
-    <section className="mt-6 overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--panel)] shadow-[var(--shadow)]">
-      <div className="flex flex-col gap-3 border-b border-[var(--border)] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">Daily rhythm</p>
-          <h2 className="mt-1 text-xl font-semibold text-[var(--text-strong)]">Habit tracker</h2>
+    <section className="card overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+        <h2 className="text-xl font-bold text-[var(--text-strong)]">Habit Tracker</h2>
+        <div className="flex items-center gap-2">
+          <NavLink className="btn-primary" to="/habits"><Plus size={14} /> Add Habit</NavLink>
+          {onToday ? <button className="box-button !h-9" type="button" onClick={onToday}>Today</button> : null}
+          {onPreviousMonth ? <button className="box-button !h-9" type="button" onClick={onPreviousMonth} aria-label="Previous period"><ChevronLeft size={15} /></button> : null}
+          {onNextMonth ? <button className="box-button !h-9" type="button" onClick={onNextMonth} aria-label="Next period"><ChevronRight size={15} /></button> : null}
         </div>
-        <div className="flex items-center gap-2"><NavLink className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 px-3 py-2 text-xs font-bold text-slate-950" to="/habits"><Plus size={14} /> Add Habit</NavLink><p className="hidden text-xs text-[var(--text-muted)] sm:block">Click a day to mark a habit complete</p></div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[940px] border-collapse text-left">
+      <div className="overflow-x-auto px-4 pb-4">
+        <table className="matrix w-full min-w-[820px] border-separate border-spacing-0 overflow-hidden rounded-lg text-left">
           <thead>
-            <tr className="border-b border-[var(--border)] bg-[var(--panel-soft)] text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--text-faint)]">
-              <th className="sticky left-0 z-20 w-8 border-r border-[var(--border)] bg-[var(--panel-soft)] px-2 py-3" rowSpan={2}>#</th><th className="sticky left-8 z-20 min-w-52 border-r border-[var(--border)] bg-[var(--panel-soft)] px-4 py-3" rowSpan={2}>Habit</th>
-              {weeks.map((week, index) => <th className="border-r border-[var(--border)] px-2 py-2 text-center" colSpan={week.length} key={`week-${index}`}>Week {index + 1}</th>)}
+            <tr className="bg-[var(--panel-soft)] text-xs font-semibold text-[var(--text-strong)]">
+              <th className="sticky left-0 z-20 w-6 bg-[var(--panel-soft)] px-1 py-2 text-center" rowSpan={3}>#</th>
+              <th className="sticky left-6 z-20 min-w-36 bg-[var(--panel-soft)] px-2 py-2" rowSpan={3}>Habit</th>
+              <th className="px-2 py-2 text-center" rowSpan={3}>Goal</th>
+              {weeks.map((week, index) => (
+                <th className="px-2 py-1.5 text-center font-semibold" colSpan={week.length} key={`week-${index}`}>
+                  Week {index + 1}
+                  <span className="block text-[10px] font-normal text-[var(--text-muted)]">{week[0].getDate()} - {week[week.length - 1].getDate()}</span>
+                </th>
+              ))}
+              <th className="min-w-24 px-2 py-2 text-center" rowSpan={3}>Progress</th>
+              <th className="min-w-20 px-2 py-2 text-center" rowSpan={3}>Completed</th>
             </tr>
-            <tr className="border-b border-[var(--border)] bg-[var(--panel-soft)] text-center text-[11px] font-semibold text-[var(--text-muted)]">
-              {days.map((day) => <th className="min-w-9 px-1 py-2" key={dateKey(day)}><span className="block text-[var(--text-strong)]">{format(day, 'd')}</span><span className="mt-0.5 block text-[9px] uppercase text-[var(--text-faint)]">{format(day, 'EEEEE')}</span></th>)}<th className="min-w-20 border-l border-[var(--border)] px-2 py-2">Progress</th><th className="min-w-20 px-2 py-2">Completed</th>
+            <tr className="bg-[var(--panel-soft)] text-center text-[9px] font-medium text-[var(--text-muted)]">
+              {days.map((day) => <th className="px-0 py-1" key={`dow-${dateKey(day)}`}>{format(day, 'EEE')}</th>)}
+            </tr>
+            <tr className="bg-[var(--panel-soft)] text-center text-[10px] font-semibold text-[var(--text-strong)]">
+              {days.map((day) => <th className="min-w-5 px-0 py-1" key={dateKey(day)}>{format(day, 'd')}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -35,19 +49,34 @@ export function HabitTracker({ month }: { month: Date }) {
               const completed = days.filter((day) => data.habitLogs.some((log) => log.habitId === habit.id && log.date === dateKey(day) && log.completed)).length
               const progress = Math.min(100, Math.round((completed / habit.monthlyTarget) * 100))
               return (
-              <tr className="border-b border-[var(--border)] last:border-b-0" key={habit.id}>
-                <td className="sticky left-0 z-10 border-r border-[var(--border)] bg-[var(--panel)] px-2 py-3 text-center text-xs text-[var(--text-faint)]">{habitIndex + 1}</td><th className="sticky left-8 z-10 border-r border-[var(--border)] bg-[var(--panel)] px-4 py-3 text-left" scope="row">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg" aria-hidden="true">{habit.icon}</span>
-                    <span className="min-w-0"><span className="block truncate text-sm font-semibold text-[var(--text-strong)]">{habit.name}</span><span className="mt-0.5 block text-[11px] text-[var(--text-muted)]">Goal {habit.monthlyTarget} days</span></span>
-                  </div>
-                </th>
-                {days.map((day) => {
-                  const dayKey = dateKey(day)
-                  const completed = data.habitLogs.some((log) => log.habitId === habit.id && log.date === dayKey && log.completed)
-                  return <td className="px-1 py-3 text-center" key={dayKey}><button className={`habit-cell ${completed ? 'habit-cell-complete' : ''}`} style={completed ? { backgroundColor: habit.color, borderColor: habit.color } : {}} type="button" onClick={() => toggleHabitLog(habit.id, dayKey)} aria-label={`${habit.name}, ${format(day, 'MMMM d, yyyy')}, ${completed ? 'completed' : 'not completed'}`} aria-pressed={completed}>{completed ? <Check size={14} strokeWidth={3} /> : null}</button></td>
-                })}<td className="border-l border-[var(--border)] px-2 py-3"><div className="h-1.5 rounded-full bg-[var(--track)]"><div className="h-full rounded-full" style={{ width: `${progress}%`, backgroundColor: habit.color }} /></div><span className="mt-1 block text-[10px] text-[var(--text-muted)]">{progress}%</span></td><td className="px-2 py-3 text-xs text-[var(--text-muted)]">{completed}/{habit.monthlyTarget}</td>
-              </tr>
+                <tr key={habit.id}>
+                  <td className="sticky left-0 z-10 bg-[var(--panel)] px-1 py-1.5 text-center text-xs text-[var(--text-muted)]">{habitIndex + 1}</td>
+                  <th className="sticky left-6 z-10 bg-[var(--panel)] px-2 py-1.5 text-left" scope="row">
+                    <span className="flex items-center gap-2.5 text-xs font-medium text-[var(--text-strong)]">
+                      <span className="text-base" aria-hidden="true">{habit.icon}</span>
+                      <span className="truncate">{habit.name}</span>
+                    </span>
+                  </th>
+                  <td className="px-2 py-1.5 text-center text-xs text-[var(--text-strong)]">{habit.monthlyTarget}</td>
+                  {days.map((day) => {
+                    const dayKey = dateKey(day)
+                    const done = data.habitLogs.some((log) => log.habitId === habit.id && log.date === dayKey && log.completed)
+                    return (
+                      <td className="px-0 py-1.5 text-center" key={dayKey}>
+                        <button className={`habit-cell ${done ? 'habit-cell-complete' : ''}`} style={done ? { backgroundColor: habit.color, borderColor: habit.color } : {}} type="button" onClick={() => toggleHabitLog(habit.id, dayKey)} aria-label={`${habit.name}, ${format(day, 'MMMM d, yyyy')}, ${done ? 'completed' : 'not completed'}`} aria-pressed={done}>
+                          {done ? <Check size={11} strokeWidth={3.5} /> : null}
+                        </button>
+                      </td>
+                    )
+                  })}
+                  <td className="px-2 py-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--track)]"><div className="h-full rounded-full" style={{ width: `${progress}%`, backgroundColor: habit.color }} /></div>
+                      <span className="w-8 text-right text-[10px] text-[var(--text-strong)]">{progress}%</span>
+                    </div>
+                  </td>
+                  <td className="px-2 py-1.5 text-center text-[11px] text-[var(--text-muted)]">{completed}/{habit.monthlyTarget}</td>
+                </tr>
               )
             })}
           </tbody>

@@ -3,6 +3,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, expect, it, beforeEach } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { HabitTracker } from '../components/dashboard/HabitTracker'
 import { AppDataProvider } from '../context/AppDataProvider'
@@ -28,7 +29,7 @@ describe('component smoke tests', () => {
   })
 
   it('toggles a habit cell through the persisted data provider', () => {
-    render(<AppDataProvider><HabitTracker month={new Date(2026, 8, 1)} /></AppDataProvider>)
+    render(<MemoryRouter><AppDataProvider><HabitTracker month={new Date(2026, 8, 1)} /></AppDataProvider></MemoryRouter>)
     const cell = screen.getByRole('button', { name: 'Wake up at 5:00 AM, September 1, 2026, completed' })
     expect(cell).toHaveAttribute('aria-pressed', 'true')
     fireEvent.click(cell)
