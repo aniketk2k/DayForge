@@ -58,3 +58,12 @@ export function createDemoData(): AppData {
     settings: { theme: 'dark', currency: 'INR' },
   }
 }
+
+export function createEmptyData(): AppData {
+  return {
+    habits: [],
+    habitLogs: [],
+    expenses: [],
+    settings: { theme: 'dark', currency: 'INR' },
+  }
+}

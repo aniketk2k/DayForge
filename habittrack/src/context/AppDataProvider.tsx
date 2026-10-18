@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { createDemoData } from '../data/demoData'
+import { createDemoData, createEmptyData } from '../data/demoData'
 import type { AppData, Expense, Habit } from '../types/app'
 import { AppDataContext } from './appData'
 
@@ -28,6 +28,7 @@ function loadInitialData(): AppData {
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(loadInitialData)
+  const [isFirstRun, setIsFirstRun] = useState(() => !localStorage.getItem(STORAGE_KEY))
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
@@ -102,5 +103,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     return true
   }
 
-  return <AppDataContext.Provider value={{ data, resetDemoData, addHabit, updateHabit, deleteHabit, toggleHabitArchive, reorderHabits, toggleHabitLog, addExpense, updateExpense, deleteExpense, replaceData }}>{children}</AppDataContext.Provider>
+  const chooseFirstRun = (mode: 'demo' | 'empty') => {
+    setData(mode === 'demo' ? createDemoData() : createEmptyData())
+    setIsFirstRun(false)
+  }
+
+  return <AppDataContext.Provider value={{ data, resetDemoData, addHabit, updateHabit, deleteHabit, toggleHabitArchive, reorderHabits, toggleHabitLog, addExpense, updateExpense, deleteExpense, replaceData, isFirstRun, chooseFirstRun }}>{children}</AppDataContext.Provider>
 }

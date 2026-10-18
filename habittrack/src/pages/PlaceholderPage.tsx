@@ -45,19 +45,10 @@ export function PlaceholderPage({ page, monthLabel, month, onSelectMonth }: Plac
         </div>
       </section>
       {phaseContent}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {['Focused workspace', 'Clear monthly rhythm', 'Built to grow with you'].map((label, index) => (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-soft)] p-5" key={label}>
-            <span className="text-xs font-bold text-[var(--text-faint)]">0{index + 1}</span>
-            <p className="mt-8 text-sm font-semibold text-[var(--text-strong)]">{label}</p>
-            <div className="mt-4 h-1 rounded-full bg-[var(--track)]"><div className={`h-full rounded-full bg-${content.accent}-400`} style={{ width: `${42 + index * 17}%` }} /></div>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
 
 function LoadingState() {
-  return <div className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--panel)] p-8 text-sm text-[var(--text-muted)]" role="status">Loading workspace...</div>
+  return <div className="mt-6 grid gap-4 sm:grid-cols-3" role="status" aria-label="Loading workspace"><div className="skeleton h-32 rounded-2xl" /><div className="skeleton h-32 rounded-2xl" /><div className="skeleton h-32 rounded-2xl" /></div>
 }
