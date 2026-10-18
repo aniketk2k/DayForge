@@ -289,5 +289,7 @@ a:focus-visible {
 }
 
 .today-column {
-  background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+  background-color: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  border-left-color: color-mix(in srgb, var(--accent) 35%, var(--border)) !important;
+  border-right-color: color-mix(in srgb, var(--accent) 35%, var(--border)) !important;
 }

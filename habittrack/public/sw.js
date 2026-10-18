@@ -1,5 +1,3 @@
-const CACHE_NAME = 'habittrack-shell-v2'
-
 self.addEventListener('install', () => {
   self.skipWaiting()
 })

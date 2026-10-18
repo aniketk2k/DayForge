@@ -51,7 +51,7 @@ export function HabitTracker({ month, onPreviousMonth, onNextMonth, onToday }: {
               {days.map((day) => {
                 const isCurrent = isToday(day)
                 return (
-                  <th className="min-w-5 px-0 py-1" key={dateKey(day)}>
+                  <th className={`min-w-5 px-0 py-1 ${isCurrent ? 'today-column' : ''}`} key={dateKey(day)}>
                     {isCurrent ? (
                       <span className="inline-flex size-5 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] text-[10px] font-bold shadow-sm" title="Today">
                         {format(day, 'd')}

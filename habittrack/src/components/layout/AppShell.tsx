@@ -41,7 +41,7 @@ const navigation = [
   { label: 'Dashboard', to: '/', icon: Home },
   { label: 'Habits', to: '/habits', icon: CheckCircle2 },
   { label: 'Expenses', to: '/expenses', icon: Wallet },
-  { label: 'Analytics', to: '/analytics', icon: BarChart3 },
+  { label: 'Analytics', to: '/analytics', icon: BarChart3, hasSubmenu: true },
   { label: 'Yearly Overview', to: '/yearly-overview', icon: CalendarDays },
   { label: 'Settings', to: '/settings', icon: Settings },
 ]
@@ -123,7 +123,7 @@ function Sidebar({
 
       {/* Navigation Links */}
       <nav className={`mt-4 flex flex-col gap-1 px-2 ${isCollapsed ? 'items-center' : ''}`} aria-label="Primary navigation">
-        {navigation.map(({ label, to, icon: Icon }) => (
+        {navigation.map(({ label, to, icon: Icon, hasSubmenu }) => (
           <NavLink
             className={({ isActive }) =>
               `nav-link ${isActive ? 'nav-link-active' : ''} ${
@@ -137,7 +137,14 @@ function Sidebar({
             title={label}
           >
             <Icon size={19} className="shrink-0" strokeWidth={1.8} />
-            {!isCollapsed ? <span className="truncate">{label}</span> : <span className="sr-only">{label}</span>}
+            {!isCollapsed ? (
+              <>
+                <span className="truncate">{label}</span>
+                {hasSubmenu ? <ChevronDown size={14} className="ml-auto text-[var(--text-muted)] opacity-70" /> : null}
+              </>
+            ) : (
+              <span className="sr-only">{label}</span>
+            )}
           </NavLink>
         ))}
       </nav>

@@ -12,7 +12,12 @@ import {
 } from 'lucide-react'
 import { HabitAnalytics } from '../components/dashboard/HabitAnalytics'
 import { HabitTracker } from '../components/dashboard/HabitTracker'
-import { ExpenseOverview } from '../components/expenses/ExpenseOverview'
+import {
+  ExpenseCharts,
+  TodayExpenseCard,
+  TodaySummaryCard,
+  TotalExpensesCard,
+} from '../components/expenses/ExpenseOverview'
 import { AnalyticsInsights } from '../components/analytics/AnalyticsInsights'
 import { ExpenseManagement } from '../components/expenses/ExpenseManagement'
 import { HabitManagement } from '../components/habits/HabitManagement'
@@ -178,25 +183,36 @@ function DashboardView({ month }: { month: Date }) {
         <>
           {sections.kpis ? <HabitAnalytics month={month} section="kpis" /> : null}
 
-          {sections.tracker || sections.charts || sections.side ? (
+          {sections.tracker || sections.charts || sections.side || sections.expenses ? (
             <div
               className={`mt-4 grid gap-4 ${
                 sections.side
-                  ? 'xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_25rem]'
+                  ? 'xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_24rem]'
                   : 'grid-cols-1'
               }`}
             >
-              {sections.tracker || sections.charts ? (
-                <div className="min-w-0 space-y-4">
-                  {sections.tracker ? <HabitTracker month={month} /> : null}
-                  {sections.charts ? <HabitAnalytics month={month} section="charts" /> : null}
+              {/* Left Column: Habit Tracker, Habit Progress, Expense Progress */}
+              <div className="min-w-0 space-y-4">
+                {sections.tracker ? <HabitTracker month={month} /> : null}
+                {sections.charts ? <HabitAnalytics month={month} section="charts" /> : null}
+                {sections.expenses ? <ExpenseCharts month={month} /> : null}
+              </div>
+
+              {/* Right Column: Top 10, Overall Progress, Today's Expense, Today's Summary, Total Expenses */}
+              {sections.side ? (
+                <div className="space-y-4">
+                  <HabitAnalytics month={month} section="side" />
+                  {sections.expenses ? (
+                    <>
+                      <TodayExpenseCard />
+                      <TodaySummaryCard />
+                      <TotalExpensesCard month={month} />
+                    </>
+                  ) : null}
                 </div>
               ) : null}
-              {sections.side ? <HabitAnalytics month={month} section="side" /> : null}
             </div>
           ) : null}
-
-          {sections.expenses ? <ExpenseOverview month={month} /> : null}
         </>
       )}
     </div>
