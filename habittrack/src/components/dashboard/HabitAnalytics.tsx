@@ -1,9 +1,12 @@
 import { useState, type ReactNode } from 'react'
 import { format } from 'date-fns'
-import { BarChart3, CheckCircle2, ChevronDown, Hourglass, LineChart, Percent, Target } from 'lucide-react'
+import { BarChart3, CheckCircle2, ChevronDown, Hourglass, LineChart, Pencil, Percent, Target } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useAppData } from '../../hooks/useAppData'
+import { useToast } from '../../hooks/useToast'
+import { calculateCountdown, useUserTargets, type UserTarget } from '../../hooks/useUserTargets'
 import { calculateHabitAnalytics, type HabitAnalytics as HabitAnalyticsData, type HabitRanking } from '../../utils/habitCalculations'
+import { TargetModal } from './TargetModal'
 
 type SortMode = 'percentage' | 'completed' | 'remaining' | 'goal'
 type AnalyticsSection = 'all' | 'kpis' | 'charts' | 'side'
@@ -20,29 +23,147 @@ export function HabitAnalytics({ month, section = 'all' }: { month: Date; sectio
 }
 
 function KpiCards({ analytics }: { analytics: HabitAnalyticsData }) {
-  const cards = [
-    { label: 'Completed', value: analytics.completed, detail: `of ${analytics.goal} target`, icon: CheckCircle2, tile: 'bg-emerald-500/15 text-emerald-400' },
-    { label: 'Goal', value: analytics.goal, detail: 'total target days', icon: Target, tile: 'bg-blue-500/15 text-blue-500' },
-    { label: 'Left', value: analytics.remaining, detail: 'days remaining', icon: Hourglass, tile: 'bg-orange-500/15 text-orange-500' },
-    { label: 'Overall Progress', value: `${analytics.percentage}%`, detail: '', icon: Percent, tile: 'bg-violet-500/15 text-violet-500' },
-  ]
+  const { target1, target2, updateTarget } = useUserTargets()
+  const { showToast } = useToast()
+  const [editingTarget, setEditingTarget] = useState<UserTarget | null>(null)
+
+  const countdown1 = calculateCountdown(target1.targetDate)
+  const countdown2 = calculateCountdown(target2.targetDate)
+
+  const handleSaveTarget = (targetId: string, updates: { title: string; targetDate: string }) => {
+    updateTarget(targetId, updates)
+    showToast(`"${updates.title}" target updated!`, 'success')
+  }
+
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      {cards.map(({ label, value, detail, icon: Icon, tile }) => (
-        <div className="card flex items-center gap-4 p-4" key={label}>
-          <span className={`tile-icon ${tile}`}><Icon size={26} /></span>
+    <>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {/* Card 1: Completed Habits */}
+        <div className="card flex items-center gap-4 p-4">
+          <span className="tile-icon bg-emerald-500/15 text-emerald-400">
+            <CheckCircle2 size={26} />
+          </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-[var(--text-muted)]">{label}</p>
-            <p className="mt-0.5 text-3xl font-bold leading-tight text-[var(--text-strong)]">{value}</p>
-            {label === 'Overall Progress' ? (
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--track)]"><div className="h-full rounded-full bg-violet-500" style={{ width: `${analytics.percentage}%` }} /></div>
-            ) : (
-              <div className="flex items-end justify-between text-xs text-[var(--text-muted)]"><span>{detail}</span>{label === 'Completed' ? <strong className="text-lg text-emerald-400">{analytics.percentage}%</strong> : null}</div>
-            )}
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-[var(--text-muted)]">Completed</p>
+              <strong className="text-sm font-bold text-emerald-400">{analytics.percentage}%</strong>
+            </div>
+            <p className="mt-0.5 text-3xl font-bold leading-tight text-[var(--text-strong)]">{analytics.completed}</p>
+            <div className="mt-1 flex items-end justify-between text-xs text-[var(--text-muted)]">
+              <span>of {analytics.goal} target days</span>
+              <span className="text-[11px] text-[var(--text-muted)]">{analytics.remaining} left</span>
+            </div>
           </div>
         </div>
-      ))}
-    </div>
+
+        {/* Card 2: User Target 1 (Countdown) */}
+        <div
+          className="card group flex items-center gap-4 p-4 cursor-pointer transition-all hover:border-blue-500/40 hover:shadow-lg"
+          onClick={() => setEditingTarget(target1)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setEditingTarget(target1)
+            }
+          }}
+          title={`Click to edit ${target1.title} and target date`}
+        >
+          <span className="tile-icon bg-blue-500/15 text-blue-400">
+            <Target size={26} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-[var(--text-muted)] truncate group-hover:text-blue-400 transition-colors">
+                {target1.title}
+              </p>
+              <span className="rounded p-1 text-[var(--text-muted)] group-hover:bg-blue-500/20 group-hover:text-blue-400 transition">
+                <Pencil size={11} />
+              </span>
+            </div>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <span className="text-3xl font-bold leading-tight text-[var(--text-strong)]">
+                {countdown1.isToday ? 'Today!' : countdown1.isPast ? `${Math.abs(countdown1.days)}d` : countdown1.days}
+              </span>
+              <span className="text-xs font-semibold text-[var(--text-muted)]">
+                {countdown1.isToday ? '🎯' : countdown1.isPast ? 'ago' : countdown1.days === 1 ? 'day left' : 'days left'}
+              </span>
+            </div>
+            <div className="mt-1 flex items-center justify-between text-xs text-[var(--text-muted)]">
+              <span className="truncate">Target: {countdown1.formattedDate}</span>
+              <span className="text-[10px] font-semibold text-blue-400 group-hover:underline">Edit</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: User Target 2 (Countdown) */}
+        <div
+          className="card group flex items-center gap-4 p-4 cursor-pointer transition-all hover:border-orange-500/40 hover:shadow-lg"
+          onClick={() => setEditingTarget(target2)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setEditingTarget(target2)
+            }
+          }}
+          title={`Click to edit ${target2.title} and target date`}
+        >
+          <span className="tile-icon bg-orange-500/15 text-orange-400">
+            <Hourglass size={26} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-[var(--text-muted)] truncate group-hover:text-orange-400 transition-colors">
+                {target2.title}
+              </p>
+              <span className="rounded p-1 text-[var(--text-muted)] group-hover:bg-orange-500/20 group-hover:text-orange-400 transition">
+                <Pencil size={11} />
+              </span>
+            </div>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <span className="text-3xl font-bold leading-tight text-[var(--text-strong)]">
+                {countdown2.isToday ? 'Today!' : countdown2.isPast ? `${Math.abs(countdown2.days)}d` : countdown2.days}
+              </span>
+              <span className="text-xs font-semibold text-[var(--text-muted)]">
+                {countdown2.isToday ? '🎯' : countdown2.isPast ? 'ago' : countdown2.days === 1 ? 'day left' : 'days left'}
+              </span>
+            </div>
+            <div className="mt-1 flex items-center justify-between text-xs text-[var(--text-muted)]">
+              <span className="truncate">Target: {countdown2.formattedDate}</span>
+              <span className="text-[10px] font-semibold text-orange-400 group-hover:underline">Edit</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Overall Progress */}
+        <div className="card flex items-center gap-4 p-4">
+          <span className="tile-icon bg-violet-500/15 text-violet-500">
+            <Percent size={26} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-[var(--text-muted)]">Overall Progress</p>
+            <p className="mt-0.5 text-3xl font-bold leading-tight text-[var(--text-strong)]">{analytics.percentage}%</p>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--track)]">
+              <div
+                className="h-full rounded-full bg-violet-500 transition-all duration-300"
+                style={{ width: `${analytics.percentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {editingTarget ? (
+        <TargetModal
+          target={editingTarget}
+          onClose={() => setEditingTarget(null)}
+          onSave={handleSaveTarget}
+        />
+      ) : null}
+    </>
   )
 }
 
