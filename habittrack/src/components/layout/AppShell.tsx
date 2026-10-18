@@ -49,7 +49,7 @@ function Sidebar({ month, onClose, onLogout }: { month: Date; onClose?: () => vo
   const analytics = calculateHabitAnalytics(data.habits, data.habitLogs, month)
 
   return (
-    <aside className="flex h-full w-72 flex-col border-r border-[var(--border)] bg-[var(--sidebar)] px-4 py-5">
+    <aside className="flex h-full w-56 flex-col border-r border-[var(--border)] bg-[var(--sidebar)] px-3 py-5">
       <div className="flex items-center justify-between px-3">
         <NavLink className="flex items-center gap-3" to="/" onClick={onClose}>
           <span className="flex size-10 items-center justify-center rounded-xl bg-[var(--accent)] text-slate-950 shadow-lg shadow-cyan-500/20">
@@ -131,7 +131,7 @@ export function AppShell({ children, month, onMonthChange, onNextMonth, onPrevio
         </div>
       ) : null}
 
-      <div className="md:pl-72">
+      <div className="md:pl-56">
         <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-xl">
           <div className="flex min-h-20 items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
             <div className="flex min-w-0 items-center gap-3">

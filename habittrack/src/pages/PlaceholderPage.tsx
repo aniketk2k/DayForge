@@ -1,14 +1,13 @@
 import { BarChart3, CircleDollarSign, LayoutDashboard, Settings, Target, TrendingUp } from 'lucide-react'
-import { lazy, Suspense, type ReactNode } from 'react'
-
-const AnalyticsInsights = lazy(() => import('../components/analytics/AnalyticsInsights').then((module) => ({ default: module.AnalyticsInsights })))
-const HabitAnalytics = lazy(() => import('../components/dashboard/HabitAnalytics').then((module) => ({ default: module.HabitAnalytics })))
-const HabitTracker = lazy(() => import('../components/dashboard/HabitTracker').then((module) => ({ default: module.HabitTracker })))
-const ExpenseOverview = lazy(() => import('../components/expenses/ExpenseOverview').then((module) => ({ default: module.ExpenseOverview })))
-const ExpenseManagement = lazy(() => import('../components/expenses/ExpenseManagement').then((module) => ({ default: module.ExpenseManagement })))
-const HabitManagement = lazy(() => import('../components/habits/HabitManagement').then((module) => ({ default: module.HabitManagement })))
-const YearlyOverview = lazy(() => import('../components/yearly/YearlyOverview').then((module) => ({ default: module.YearlyOverview })))
-const SettingsPanel = lazy(() => import('../components/settings/SettingsPanel').then((module) => ({ default: module.SettingsPanel })))
+import type { ReactNode } from 'react'
+import { HabitAnalytics } from '../components/dashboard/HabitAnalytics'
+import { HabitTracker } from '../components/dashboard/HabitTracker'
+import { ExpenseOverview } from '../components/expenses/ExpenseOverview'
+import { AnalyticsInsights } from '../components/analytics/AnalyticsInsights'
+import { ExpenseManagement } from '../components/expenses/ExpenseManagement'
+import { HabitManagement } from '../components/habits/HabitManagement'
+import { YearlyOverview } from '../components/yearly/YearlyOverview'
+import { SettingsPanel } from '../components/settings/SettingsPanel'
 
 type PlaceholderPageProps = {
   page: string
@@ -29,26 +28,12 @@ const pageCopy: Record<string, { description: string; icon: typeof LayoutDashboa
 export function PlaceholderPage({ page, monthLabel, month, onSelectMonth }: PlaceholderPageProps) {
   const content = pageCopy[page]
   const Icon = content.icon
-  const phaseContent: ReactNode = <Suspense fallback={<LoadingState />}>{page === 'Dashboard' ? <><HabitAnalytics month={month} /><HabitTracker month={month} /><ExpenseOverview month={month} /></> : page === 'Habits' ? <HabitManagement month={month} /> : page === 'Expenses' ? <ExpenseManagement month={month} /> : page === 'Analytics' ? <><HabitAnalytics month={month} /><AnalyticsInsights month={month} /></> : page === 'Yearly Overview' && onSelectMonth ? <YearlyOverview month={month} onSelectMonth={onSelectMonth} /> : page === 'Settings' ? <SettingsPanel /> : null}</Suspense>
+  const phaseContent: ReactNode = page === 'Dashboard' ? <><HabitAnalytics month={month} section="kpis" /><div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]"><div className="min-w-0 space-y-4"><HabitTracker month={month} /><HabitAnalytics month={month} section="charts" /></div><HabitAnalytics month={month} section="side" /></div><ExpenseOverview month={month} /></> : page === 'Habits' ? <HabitManagement month={month} /> : page === 'Expenses' ? <ExpenseManagement month={month} /> : page === 'Analytics' ? <><HabitAnalytics month={month} /><AnalyticsInsights month={month} /></> : page === 'Yearly Overview' && onSelectMonth ? <YearlyOverview month={month} onSelectMonth={onSelectMonth} /> : page === 'Settings' ? <SettingsPanel /> : null
 
   return (
     <div className="animate-fade-in">
-      <section className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--panel)] p-7 shadow-[var(--shadow)] sm:p-10">
-        <div className="absolute -right-20 -top-20 size-64 rounded-full bg-cyan-400/5 blur-3xl" aria-hidden="true" />
-        <div className="relative max-w-2xl">
-          <div className={`mb-6 flex size-12 items-center justify-center rounded-2xl bg-${content.accent}-400/10 text-${content.accent}-400`}>
-            <Icon size={23} />
-          </div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">{monthLabel}</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text-strong)] sm:text-4xl">{page === 'Dashboard' ? 'A clearer view of your month.' : content.description}</h2>
-          <p className="mt-4 max-w-xl text-base leading-7 text-[var(--text-muted)]">{content.description} Everything here is connected to your locally persisted workspace.</p>
-        </div>
-      </section>
+      {page !== 'Dashboard' ? <section className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--panel)] p-7 shadow-[var(--shadow)] sm:p-10"><div className={`mb-6 flex size-12 items-center justify-center rounded-2xl bg-${content.accent}-400/10 text-${content.accent}-400`}><Icon size={23} /></div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">{monthLabel}</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--text-strong)] sm:text-4xl">{content.description}</h2><p className="mt-4 max-w-xl text-base leading-7 text-[var(--text-muted)]">Everything here is connected to your locally persisted workspace.</p></section> : null}
       {phaseContent}
     </div>
   )
-}
-
-function LoadingState() {
-  return <div className="mt-6 grid gap-4 sm:grid-cols-3" role="status" aria-label="Loading workspace"><div className="skeleton h-32 rounded-2xl" /><div className="skeleton h-32 rounded-2xl" /><div className="skeleton h-32 rounded-2xl" /></div>
 }
